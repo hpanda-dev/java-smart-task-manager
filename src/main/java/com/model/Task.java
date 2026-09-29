@@ -63,10 +63,11 @@ public class Task {
     public static void main(String args[]){
 
         Task task1 = new Task(101, "Learn Java", "HIGH", TaskStatus.TODO, new User(1, "Ravi"));
-        Task task2 = new Task(102, "Read Book", "MEDIUM", TaskStatus.IN_PROGRESS, new User(2, "Priya"));
-        task1.updateStatus(TaskStatus.DONE);
-        task1.displayTaskDetails();
-        task2.displayTaskDetails();
+        TaskAction tk = new CompleteTaskAction(task1);
+        task1.initial();
+        task1.complete();
+        task1.reopen();
+        tk.execute();
     }
 
     /**
@@ -106,42 +107,31 @@ public class Task {
      *
      */
     public void displayTaskDetails(){
-        System.out.println("\n" + "Task ID: " + this.getTaskID() + " - " + this.getTaskTitle() + " - " + this.user.displayUser());
-        System.out.println("Priority: " + this.getTaskPriority());
+        System.out.println("\n" + "Task ID: " + this.taskID + " - " + this.taskTitle + " - " + this.user.displayUser());
+        System.out.println("Priority: " + this.taskPriority);
         System.out.println("Status: " + this.status);
     }
 
     /**
-     *
-     * returns the taskId which is shared by user as input and assigned in constructure
-     *
-     * @return taskId
+     * complete() method is used to mark the task status as DONE
      */
-    public int getTaskID() {
-        return taskID;
+    public void complete(){
+        this.status = TaskStatus.DONE;
+        System.out.println("Completed Task → Status: " + this.status);
     }
 
     /**
-     *
-     * returns the task name which is shared by user as input and assigned in constructure
-     *
-     * @return taskTitle
+     * reopen() method is used to mark the task status as TODO
      */
-    public String getTaskTitle() {
-        return taskTitle;
+    public void reopen(){
+        this.status = TaskStatus.TODO;
+        System.out.println("Reopen Task → Status: " + this.status);
     }
 
     /**
-     *
-     * returns the task priority which is shared by user as input and assigned in constructure
-     *
-     * @return taskPriority
+     * initial() method is used to show the current status of the task.
      */
-    public String getTaskPriority() {
-        return taskPriority;
-    }
-
-    public void updateStatus(TaskStatus status){
-        this.status = status;
+    public void initial() {
+        System.out.println("Initial Status: " + this.status);
     }
 }
