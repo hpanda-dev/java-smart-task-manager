@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2026 Hrushikesh Panda.
  *
  * All rights are reserved . Reproduction in whole and in part is prohibited
@@ -7,8 +7,6 @@
  */
 
 package com.hkp.model;
-
-import java.util.Scanner;
 
 /**
  *
@@ -24,8 +22,8 @@ public class Task {
     private int taskID;
     private String taskTitle;
     private String taskPriority;
-    private boolean isCompleted;
-    static Task[] task = null;
+    private TaskStatus status ;
+    private User user;
 
     /**
      *
@@ -34,95 +32,71 @@ public class Task {
      * @param taskID  unique id to represent the task
      * @param taskTitle  name of the task
      * @param taskPriority priority of the task
-     * @param isCompleted task completion status
+     * @param status task completion status
      *
      */
-    public Task(int taskID, String taskTitle, String taskPriority, boolean isCompleted) {
-        this.taskID = taskID;
-        this.taskTitle = taskTitle;
-        this.taskPriority = taskPriority;
-        this.isCompleted = isCompleted;
+    public Task(int taskID, String taskTitle, String taskPriority, TaskStatus status, User user) {
+        if(taskDetailsValidation(taskID, taskTitle, taskPriority)) {
+            this.taskID = taskID;
+            this.taskTitle = taskTitle;
+            this.taskPriority = taskPriority;
+            this.status = status;
+            this.user = user;
+        }else
+            throw new IllegalArgumentException("Invalid Task Details");
     }
 
+    /**
+     * Creates for learning overloading
+     */
+    public Task(){
+        this.taskID = 1;
+        this.taskTitle = "Default Task";
+        this.taskPriority = "LOW";
+        this.status = TaskStatus.TODO;
+        this.user = new User(0, "Default User");
+    }
+
+    /**
+        Main Method
+     */
     public static void main(String args[]){
-        Scanner sc = new Scanner(System.in);
-        int n, id;
-        String title, priority;
-        Boolean completed;
 
-        while(true) {
-            System.out.println("Enter number of tasks : ");
-            n = sc.nextInt();
-            if (n >= 2)
-                break;
-            System.out.println("The given number is Invalid, please give a number more than or equal to 2");
-        }
-
-        task = new Task[n]; //assing the no of tasks which needs to created
-
-        for (int i=0; i < n ; i++){
-            System.out.println("Enter details of task " + (i+1));
-            System.out.println("=========================");
-
-            System.out.println("Enter task id : ");
-            id = sc.nextInt();
-            sc.nextLine();
-
-            System.out.println("Enter task title : ");
-            title = sc.nextLine();
-
-            System.out.println("Enter task priority : ");
-            priority = sc.nextLine();
-
-            System.out.println("Enter task completed : ");
-            completed = sc.nextBoolean();
-
-            if(Task.taskDetailsValidation(i, id, title, priority, completed)){
-                task[i] = new Task(id, title, priority, completed);
-
-            }
-            else {
-                System.err.println("Task details validation failed and details are not stored, " +
-                        "provide proper details");
-            }
-        }
-        Task.displayTaskDetails();
+        Task task1 = new Task(101, "Learn Java", "HIGH", TaskStatus.TODO, new User(1, "Ravi"));
+        Task task2 = new Task(102, "Read Book", "MEDIUM", TaskStatus.IN_PROGRESS, new User(2, "Priya"));
+        task1.updateStatus(TaskStatus.DONE);
+        task1.displayTaskDetails();
+        task2.displayTaskDetails();
     }
 
     /**
      *
      * Validates the tasks details which was given by user
      *
-     * @param i  used to represent the task number if any case all the details are wrong.
      * @param id task id given by user
-     * @param name task name given by user
+     * @param title task title name given by user
      * @param priority task priority given by user
-     * @param completed task completion status given by user
      *
      * @return true if all inputs are valid, otherwise return false
      *
      */
-    public static boolean taskDetailsValidation(int i, int id, String name, String priority, Boolean completed) {
-        if (id < 0){
-            System.out.println("Id validation is failed, because it needs to be greater than 0 for Task " + (i+1));
+    public static boolean taskDetailsValidation(int id, String title, String priority) {
+        if (id <= 0){
+            System.out.println("Id validation is failed, because it needs to be greater than 0 for Task " + id);
             return false;
         }
-        else if(name.isEmpty()) {
-            System.out.println("Name validation is failed, because it is empty for Task " + (i+1));
+        else if(title == null || title.trim().isEmpty()) {
+            System.out.println("Title validation is failed, because it is empty for Task " + id);
             return false;
         }
-        else if(!(priority.equalsIgnoreCase("LOW") || priority.contains("MEDIUM") || priority.contains("HIGH"))) {
+        else if(!(priority.equalsIgnoreCase("LOW") || priority.equalsIgnoreCase("MEDIUM") ||
+                priority.equalsIgnoreCase("HIGH"))) {
             System.out.println("Priority validation is failed because it does not contains LOW , MEDIUM or HIGH" +
-                    " Task " + (i+1));
+                    " Task " + id);
             return false;
         }
-        else if(completed || !completed)
-            return true;
-        else {
-            System.out.println("completed validation is failed, because its should be true or false" +
-                    " Task " + (i+1));
-            return false;
-        }
+
+        return true;
 
     }
 
@@ -131,13 +105,10 @@ public class Task {
      * Displays the task details which are stored.
      *
      */
-    public static void displayTaskDetails(){
-        for(Task tk : task){
-            System.out.println("\n"+"Task ID :"+tk.getTaskID());
-            System.out.println("Title :"+tk.getTaskTitle());
-            System.out.println("Priority :"+tk.getTaskPriority());
-            System.out.println("Completed :"+tk.isCompleted()+"\n");
-        }
+    public void displayTaskDetails(){
+        System.out.println("\n" + "Task ID: " + this.getTaskID() + " - " + this.getTaskTitle() + " - " + this.user.displayUser());
+        System.out.println("Priority: " + this.getTaskPriority());
+        System.out.println("Status: " + this.status);
     }
 
     /**
@@ -170,13 +141,7 @@ public class Task {
         return taskPriority;
     }
 
-    /**
-     *
-     * returns the status of task which is shared by user as input and assigned in constructure
-     *
-     * @return isCompleted
-     */
-    public boolean isCompleted() {
-        return isCompleted;
+    public void updateStatus(TaskStatus status){
+        this.status = status;
     }
 }
