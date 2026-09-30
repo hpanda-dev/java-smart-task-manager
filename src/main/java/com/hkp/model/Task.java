@@ -24,6 +24,7 @@ public class Task {
     private String taskPriority;
     private TaskStatus status ;
     private User user;
+    private int estimatedHours;
 
     /**
      *
@@ -35,13 +36,14 @@ public class Task {
      * @param status task completion status
      *
      */
-    public Task(int taskID, String taskTitle, String taskPriority, TaskStatus status, User user) {
+    public Task(int taskID, String taskTitle, String taskPriority, TaskStatus status, User user, int estimatedHours) {
         if(taskDetailsValidation(taskID, taskTitle, taskPriority)) {
             this.taskID = taskID;
             this.taskTitle = taskTitle;
             this.taskPriority = taskPriority;
             this.status = status;
             this.user = user;
+            this.estimatedHours = estimatedHours;
         }else
             throw new IllegalArgumentException("Invalid Task Details");
     }
@@ -62,7 +64,7 @@ public class Task {
      */
     public static void main(String args[]){
 
-        Task task1 = new Task(101, "Learn Java", "HIGH", TaskStatus.TODO, new User(1, "Ravi"));
+        Task task1 = new Task(101, "Learn Java", "HIGH", TaskStatus.TODO, new User(1, "Ravi"), 5);
         TaskAction tk = new CompleteTaskAction(task1);
         task1.initial();
         task1.complete();
@@ -133,5 +135,9 @@ public class Task {
      */
     public void initial() {
         System.out.println("Initial Status: " + this.status);
+    }
+
+    public void calculateEfforts(){
+
     }
 }
