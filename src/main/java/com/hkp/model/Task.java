@@ -1,6 +1,5 @@
 /**
  * Copyright (c) 2026 Hrushikesh Panda.
- *
  * All rights are reserved . Reproduction in whole and in part is prohibited
  * without writing consent to the copyright owner.
  *
@@ -8,14 +7,11 @@
 
 package com.hkp.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- *
- *  Task Management System
- * 1. Create a Task with user specific inputs
- * 2. Validates it, if valid task is created and data is stored
- * 3. if not valid, it will throw error why it is not valid
- * 4. Display all the tasks
- *
+ *  Task Management System : Create, Validates, Display a Task with user specific inputs
  */
 public class Task {
 
@@ -24,7 +20,7 @@ public class Task {
     private String taskPriority;
     private TaskStatus status ;
     private User user;
-    private int estimatedHours;
+    private double estimatedHours;
 
     /**
      *
@@ -33,11 +29,13 @@ public class Task {
      * @param taskID  unique id to represent the task
      * @param taskTitle  name of the task
      * @param taskPriority priority of the task
-     * @param status task completion status
+     * @param status object of TaskStatus enum
+     * @param user object of User class
+     * @param estimatedHours effort estimation for completion of task
      *
      */
     public Task(int taskID, String taskTitle, String taskPriority, TaskStatus status, User user, int estimatedHours) {
-        if(taskDetailsValidation(taskID, taskTitle, taskPriority)) {
+        if(taskDetailsValidation(taskID, taskTitle, taskPriority, estimatedHours)) {
             this.taskID = taskID;
             this.taskTitle = taskTitle;
             this.taskPriority = taskPriority;
@@ -56,6 +54,7 @@ public class Task {
         this.taskTitle = "Default Task";
         this.taskPriority = "LOW";
         this.status = TaskStatus.TODO;
+        this.estimatedHours = 0.0;
         this.user = new User(0, "Default User");
     }
 
@@ -64,12 +63,19 @@ public class Task {
      */
     public static void main(String args[]){
 
-        Task task1 = new Task(101, "Learn Java", "HIGH", TaskStatus.TODO, new User(1, "Ravi"), 5);
-        TaskAction tk = new CompleteTaskAction(task1);
-        task1.initial();
-        task1.complete();
-        task1.reopen();
-        tk.execute();
+        Task task1 = new DevelopmentTask(101, "Code Java", "HIGH", TaskStatus.TODO, new User(1, "Ravi"), 10);
+        Task task2 = new MaintenanceTask(102, "Read Book", "MEDIUM", TaskStatus.IN_PROGRESS, new User(2, "Priya"), 6);
+        List<Task> taskList = new ArrayList<>();
+        taskList.add(task1);
+        taskList.add(task2);
+        for(Task t : taskList){
+            if(t instanceof DevelopmentTask){
+                DevelopmentTask developmentTask = (DevelopmentTask) t;
+                developmentTask.calculateEfforts();
+            }
+            else
+                t.calculateEfforts();
+        }
     }
 
     /**
@@ -79,11 +85,12 @@ public class Task {
      * @param id task id given by user
      * @param title task title name given by user
      * @param priority task priority given by user
+     * @param estimatedHours effort estimation given by user
      *
      * @return true if all inputs are valid, otherwise return false
      *
      */
-    public static boolean taskDetailsValidation(int id, String title, String priority) {
+    public static boolean taskDetailsValidation(int id, String title, String priority, double estimatedHours) {
         if (id <= 0){
             System.out.println("Id validation is failed, because it needs to be greater than 0 for Task " + id);
             return false;
@@ -96,6 +103,10 @@ public class Task {
                 priority.equalsIgnoreCase("HIGH"))) {
             System.out.println("Priority validation is failed because it does not contains LOW , MEDIUM or HIGH" +
                     " Task " + id);
+            return false;
+        }
+        else if(estimatedHours < 0){
+            System.out.println("Effort estimation validation is failed, because it needs to be greater than or equals to 0 for Task " + id);
             return false;
         }
 
@@ -112,6 +123,54 @@ public class Task {
         System.out.println("\n" + "Task ID: " + this.taskID + " - " + this.taskTitle + " - " + this.user.displayUser());
         System.out.println("Priority: " + this.taskPriority);
         System.out.println("Status: " + this.status);
+    }
+
+    /**
+     *
+     * returns the taskId which is given by user
+     *
+     * @return taskId
+     */
+    public int getTaskID() {
+        return taskID;
+    }
+
+    /**
+     *
+     * returns the estimatedHours which is given by user
+     *
+     * @return taskId
+     */
+    public double getEstimatedHours() {
+        return estimatedHours;
+    }
+
+    /**
+     *
+     * returns the task name which is given by user
+     *
+     * @return taskTitle
+     */
+    public String getTaskTitle() {
+        return taskTitle;
+    }
+
+    /**
+     *
+     * returns the task priority which is given by user
+     *
+     * @return taskPriority
+     */
+    public String getTaskPriority() {
+        return taskPriority;
+    }
+
+    /**
+     *  updateStatus() method is used modify the status.
+     */
+
+    public void updateStatus(TaskStatus status){
+        this.status = status;
     }
 
     /**
@@ -137,7 +196,10 @@ public class Task {
         System.out.println("Initial Status: " + this.status);
     }
 
+    /**
+     *  calculateEfforts() method is used to print the estimatedHours which is given by user
+     */
     public void calculateEfforts(){
-
+        System.out.println("Effort : "+this.getEstimatedHours());
     }
 }
